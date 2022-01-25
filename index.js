@@ -9,6 +9,7 @@ const { Door } = require('./classes/Door');
 const { Office } = require('./classes/Office');
 const { Clock } = require('./classes/Clock');
 const { CameraSystem } = require('./classes/CameraSystem');
+const { PowerSystem } = require('./classes/PowerSystem');
 
 // Functions
 const utils = require('./utils/utils');
@@ -22,17 +23,11 @@ let nights = require('./data/nights.json');
 let images = require('./data/images.json');
 
 
-
 let animatronics = [];
 isWatching = false;
 let deleteTime = 2000;
-let power = 100;
 // 1 hour passes in the game each 1 minute and 30 seconds
 let clock = new Clock();
-let fullUsage = ["🟩", "🟩", "🟨", "🟥"];
-let powerUsage = [9.6, 4.8, 3.2, 2.4]; // each second
-let extraUsage = 0;
-let usage = 1;
 let FPS = 30;
 let levels = [1, 1, 0, 0];
 let night = 1;
@@ -43,6 +38,7 @@ let startImg = false;
 let extraMsgs = [];
 
 let Home = new Office(new Door(), new Door());
+let Power = new PowerSystem();
 
 // Emojis by Id and name
 let emoIds = utils.objectMap(emojiData, e => e.id);
@@ -67,14 +63,14 @@ const getNight = (n) => {
         let currentData = nights["Night " + n];
         if (currentData) data.drain = currentData.drain;
     }
-    if (data.drain) extraUsage = data.drain;
+    if (data.drain) Power.extraUsage = data.drain;
     if (data.time) callTime = (data.time + 10) * 1000;
 }
 
 // Getting the camera data into camera objects
 
 const getCameras = (cameraData) => {
-    let cameras = [];    
+    let cameras = [];
     for (let cam in cameraData) {
         let data = cameraData[cam];
         let src = "./assets/Cameras/" + cam + "/";
@@ -136,7 +132,7 @@ if (emoNames.yellow && emoNames.green && emoNames.red) {
     let red = getEmojiName(emoNames.red, emoIds.red);
     let yellow = getEmojiName(emoNames.yellow, emoIds.yellow);
     let lime = emoNames.lime ? getEmojiName(emoNames.lime, emoIds.lime) : green;
-    fullUsage = [green, lime, yellow, red];
+    Power.fullUsage = [green, lime, yellow, red];
 }
 
 
@@ -360,7 +356,6 @@ commands = {
     },
     "camera": function (message, args) {
         if (!checkGame() || powerOut) return;
-        let camera = cameraSystem.camera;
         Home.leftDoor.isOn = false;
         Home.rightDoor.isOn = false;
         checkUsage();
@@ -440,6 +435,7 @@ const gameLoop = () => {
     //if (dontRun) console.log("dontRun");
     if (!dontRun) {
         let camera = cameraSystem.camera;
+        let power = Power.power;
         timer++;
         let realTime = 1 / FPS;
         //console.log("Running");
@@ -489,7 +485,7 @@ const gameLoop = () => {
         }
 
         if (!powerOut) {
-            updatePower(FPS);
+            Power.updatePower(FPS, clock.gameHour);
             checkPower();
 
             if (Home.inside.length > 0) {
@@ -669,23 +665,13 @@ const sendImageSetGame = async (picture) => {
     await sendImageGetLink(picture).then(async (link) => { await game.edit(link); });
 }
 
-const getUsage = () => fullUsage.slice(0, usage).join("");
-
 const getMessage = () => {
     let { room, camera } = cameraSystem;
+    let { power } = Power;
     return room + (isWatching ? " [ " + camera.name + " ]" : "") + " - Power: " + Math.round(power) + "% - " + clock.getCurrentHour() + "AM" + "\n" + "Usage: " + getUsage() + "\n" + extraMsgs.join("\n");
 }
 
-const updateUsage = (val) => {
-    usage = utils.clamp(usage + val, 1, fullUsage.length);
-}
-
-const updatePower = (tick) => {
-    // Extra power
-    power -= extraUsage == 0 ? 0 : (extraUsage / clock.gameHour) * (1 / tick);
-    // Power usage
-    power -= 1 / powerUsage[usage - 1] * (1 / tick);
-}
+const { updateUsage, getUsage } = Power;
 
 const resetVariables = () => {
     gameOver = false;
@@ -693,12 +679,11 @@ const resetVariables = () => {
     powerOut = false;
     phase = 0;
     timer = 0;
-    power = 100;
-    usage = 1;
     counter = 0;
     maxCounter = 0;
     clock.reset();
     cameraSystem.reset();
+    Power.reset();
     musicMsg = null;
     gameStarted = false;
     gameMsg = null;
@@ -818,6 +803,7 @@ const cutPower = () => {
 }
 
 const checkPower = () => {
+    let power = Power.power;
     if (power <= 0) cutPower();
 }
 
@@ -880,11 +866,12 @@ const checkAndPush = (arr, val) => {
 }
 
 const checkUsage = () => {
-    usage = 1;
+    let usage = 1;
     if (Home.leftDoor.isOn || Home.rightDoor.isOn) usage++;
     if (isWatching) usage++;
     if (Home.leftDoor.isClosed) usage++;
     if (Home.rightDoor.isClosed) usage++;
+    Power.usage = usage;
 }
 
 const updateOffice = () => {
