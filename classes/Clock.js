@@ -9,8 +9,19 @@ class Clock{
     }
 
     getCurrentHour = () => this.hours[this.currentHour];
-    advanceHour = () => this.currentHour = clamp(this.currentHour + 1, 0, this.hours.length - 1);
-    resetHour = () => this.currentHour = 0;
+    advanceHour = () => {
+        this.currentHour = utils.clamp(this.currentHour + 1, 0, this.hours.length - 1);
+        this.hourCounter = 0;
+    }
+    checkPassed = () => this.hourCounter>=this.gameHour;
+    reset = () => {
+        this.currentHour = 0;
+        this.hourCounter = 0;
+    }
 
     
+}
+
+module.exports = {
+    Clock
 }

@@ -7,6 +7,7 @@ const {Camera, Scene, Picture} = require('./classes/Camera');
 const { Animatronic, Freddy, Foxy } = require('./classes/Animatronic');
 const { Door } = require('./classes/Door');
 const { Office } = require('./classes/Office');
+const { Clock } = require('./classes/Clock');
 const utils = require('./utils/utils');
 const { performance } = require('perf_hooks');
 const { clamp } = require('./utils/utils');
@@ -27,11 +28,8 @@ let cameraIndex = 0;
 isWatching = false;
 let deleteTime = 2000;
 let power = 100;
-let hours = [12, 1, 2, 3, 4, 5, 6];
-let hourIndex = 0;
-let hour = hours[hourIndex];
-let gameHour = 90;
 // 1 hour passes in the game each 1 minute and 30 seconds
+let clock = new Clock();
 let room = "Office";
 let fullUsage = ["🟩", "🟩", "🟨", "🟥"];
 let powerUsage = [9.6, 4.8, 3.2, 2.4]; // each second
@@ -47,10 +45,6 @@ let startImg = false;
 let extraMsgs = [];
 
 let Home = new Office(new Door(), new Door());
-//Home.leftDoor.occupied = true;
-//Home.rightDoor.occupied = true;
-
-// Forced 6 am save: power = 7; hourIndex = 5;
 
 let office = Home.getPicture();
 
@@ -448,26 +442,29 @@ let counter = 0;
 let maxCounter = 0;
 let gameOver = false;
 let secondPassed = false;
-let hourCounter = 0;
 let killTime = 20;
 let foxyKillTime = 20;
 let foxyCounter = foxyKillTime;
 let foxyUsage = 1;
 let checked2A = false;
 let dontRun = false;
-let fullCounter = 0;
 let yBKillTime = 5;
 let yBCounter = yBKillTime;
+
+
+
 FPS = 60;
 const gameLoop = () => {
     //if (dontRun) console.log("dontRun");
     if (!dontRun) {
         timer++;
-        fullCounter++;
+        let realTime = 1 / FPS;
         //console.log("Running");
 
+        clock.hourCounter+= realTime;
+
         if(Home.yellowBear && !isWatching){
-            yBCounter-= 1 / FPS;
+            yBCounter-= realTime;
             if(yBCounter <= 0){
                 yellowBearKill();
                 return;
@@ -475,10 +472,10 @@ const gameLoop = () => {
         }
 
         animatronics.forEach(a => {
-            a.counter+= 1 / FPS;
-            if (Home.inside.includes(a.id)) a.killTime-= 1 / FPS;
+            a.counter+= realTime;
+            if (Home.inside.includes(a.id)) a.killTime-= realTime
             if (a.id == 3 && a.phase > 2) {
-                foxyCounter-= 1 / FPS;
+                foxyCounter-= realTime
                 if (foxyCounter <= 0) {
                     if (!a.door.isClosed) EndGame(a.screamer);
                     else {
@@ -499,13 +496,11 @@ const gameLoop = () => {
 
         if (timer == FPS) {
             timer = 0;
-            hourCounter++;
-            //console.log(hourCounter);
             secondPassed = true;
 
-            if (hourCounter == gameHour) {
-                hour = hours[++hourIndex];
-                hourCounter = 0;
+            if (clock.checkPassed()){
+                clock.advanceHour();
+                gameMsg.edit(getMessage());
                 checkHour();
             }
         }
@@ -638,7 +633,7 @@ client.on('messageCreate', message => {
             if (isWatching) commands["select"](message, [command]);
         }
 
-        message.delete();
+        message.delete().catch(err => console.log(err));
     }
 });
 
@@ -687,13 +682,13 @@ sendImageGetLink = async (picture) => {
 }
 
 const sendImageSetGame = async (picture) => {
-    if (gameOver && hour == 6) return;
+    if (gameOver && clock.getCurrentHour() == 6) return;
     await sendImageGetLink(picture).then(async (link) => { await game.edit(link); });
 }
 
 const getUsage = () => fullUsage.slice(0, usage).join("");
 
-const getMessage = () => room + (isWatching ? " [ " + camera.name + " ]" : "") + " - Power: " + Math.round(power) + "% - " + hour + "AM" + "\n" + "Usage: " + getUsage() + "\n" + extraMsgs.join("\n");
+const getMessage = () => room + (isWatching ? " [ " + camera.name + " ]" : "") + " - Power: " + Math.round(power) + "% - " + clock.getCurrentHour() + "AM" + "\n" + "Usage: " + getUsage() + "\n" + extraMsgs.join("\n");
 
 const updateUsage = (val) => {
     usage = utils.clamp(usage + val, 1, fullUsage.length);
@@ -701,7 +696,7 @@ const updateUsage = (val) => {
 
 const updatePower = (tick) => {
     // Extra power
-    power -= extraUsage == 0 ? 0 : (extraUsage / gameHour) * (1 / tick);
+    power -= extraUsage == 0 ? 0 : (extraUsage / clock.gameHour) * (1 / tick);
     // Power usage
     power -= 1 / powerUsage[usage - 1] * (1 / tick);
 }
@@ -719,8 +714,7 @@ const resetVariables = () => {
     room = "Office";
     counter = 0;
     maxCounter = 0;
-    hour = "12";
-    hourIndex = 0;
+    clock.reset();
     musicMsg = null;
     gameStarted = false;
     gameMsg = null;
@@ -805,6 +799,7 @@ const checkCounters = () => {
 }
 
 const checkHour = () => {
+    let hour = clock.getCurrentHour();
     if (hour != 6) gameMsg.edit(getMessage());
     switch (hour) {
         case 2:
