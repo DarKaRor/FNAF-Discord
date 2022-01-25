@@ -1,0 +1,61 @@
+{
+    "0":{
+        "name": "Bonnie",
+        "cameras": [
+            "1B",
+            "2A",
+            "2B",
+            "3",
+            "5"
+        ],
+        "time": "4.97",
+        "isSensitive": false,
+        "spawn": "1B",
+        "default": "1A",
+        "screamer": "https://c.tenor.com/sQT0Hv1OM-wAAAAC/bonnie-fnaf1.gif",
+        "type": "1"
+    },
+    "1":{
+        "name": "Chica",
+        "cameras":[
+            "1B",
+            "4A",
+            "4B",
+            "7"
+        ],
+        "time": "4.985",
+        "isSensitive": false,
+        "spawn": "1B",
+        "default": "1A",
+        "screamer": "https://c.tenor.com/uqjG1MkNF2wAAAAC/chica-fnaf.gif",
+        "type": "1"
+    },
+    "2":{
+        "name": "Freddy",
+        "cameras":[
+            "1B",
+            "4A",
+            "4B",
+            "7"
+        ],
+        "time": "3.02",
+        "isSensitive": true,
+        "spawn": "4A",
+        "default": "1A",
+        "screamer": "https://i.kym-cdn.com/photos/images/original/000/880/818/7f9.gif",
+        "type": "2"
+    },
+    "3":{
+        "name": "Foxy",
+        "cameras":[
+            "1C",
+            "2A"
+        ],
+        "time": "5.01",
+        "isSensitive": true,
+        "spawn": "1C",
+        "default": "1C",
+        "screamer": "https://c.tenor.com/TJyfkYq7UmEAAAAC/foxy-jump-scare.gif",
+        "type": "3"
+    }
+}

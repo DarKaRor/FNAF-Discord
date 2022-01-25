@@ -1,0 +1,73 @@
+{
+    "Night 1": {
+        "levels": [
+            0,
+            0,
+            0,
+            0
+        ],
+        "sound": "voiceover1.wav",
+        "time": 206
+    },
+    "Night 2": {
+        "levels": [
+            3,
+            1,
+            0,
+            1
+        ],
+        "sound": "voiceover2.wav",
+        "time": 103,
+        "drain": 1.5
+    },
+    "Night 3": {
+        "levels": [
+            0,
+            5,
+            1,
+            2
+        ],
+        "sound": "voiceover3.wav",
+        "time": 75,
+        "drain": 1.8
+    },
+    "Night 4": {
+        "levels": [
+            [
+                2,
+                4,
+                1,
+                6
+            ],
+            [
+                2,
+                4,
+                2,
+                6
+            ]
+        ],
+        "random": true,
+        "sound": "voiceover4.wav",
+        "time": 65,
+        "drain": 2.25
+    },
+    "Night 5": {
+        "levels": [
+            5,
+            7,
+            3,
+            5
+        ],
+        "sound": "voiceover5.wav",
+        "time": 37,
+        "drain": 3
+    },
+    "Night 6":{
+        "levels": [
+            10,
+            12,
+            4,
+            6
+        ]
+    }
+}

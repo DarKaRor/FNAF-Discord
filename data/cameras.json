@@ -1,0 +1,198 @@
+{
+    "1A": {
+        "defaultState": "1110",
+        "name": "Show Stage",
+        "pictures": {
+            "0000": "https://media.discordapp.net/attachments/720701609855680552/931210634832519218/empty.png?width=1440&height=648",
+            "1110": [
+                "https://media.discordapp.net/attachments/720701609855680552/931210679174725682/123.png?width=1440&height=648",
+                {
+                    "name": "https://media.discordapp.net/attachments/720701609855680552/931210714612367390/123-2.png?width=1440&height=648",
+                    "rarity": 20
+                }
+            ],
+            "1010": "https://media.discordapp.net/attachments/720701609855680552/931210757952131192/13.png?width=1440&height=648",
+            "0110": "https://media.discordapp.net/attachments/720701609855680552/931210792659988490/23.png?width=1440&height=648",
+            "0010": [
+                "https://media.discordapp.net/attachments/720701609855680552/931210833382506496/3.png?width=1440&height=648",
+                "https://media.discordapp.net/attachments/720701609855680552/931210874943832074/3-2.png?width=1440&height=648"
+            ]
+        },
+        "followUps": [
+            "1B",
+            "5",
+            "7"
+        ]
+    },
+    "1B": {
+        "defaultState": "0000",
+        "name": "Dinning Area",
+        "pictures": {
+            "0000": "https://media.discordapp.net/attachments/720701609855680552/931210936142942288/empty.png?width=1440&height=648",
+            "1000": [
+                "https://media.discordapp.net/attachments/720701609855680552/931210999577604166/1.png?width=1440&height=648",
+                "https://media.discordapp.net/attachments/720701609855680552/931211036047065188/1-2.png?width=1440&height=648"
+            ],
+            "0100": [
+                "https://media.discordapp.net/attachments/720701609855680552/931211069614075984/2.png?width=1440&height=648",
+                "https://media.discordapp.net/attachments/720701609855680552/931211101704687706/2-2.png?width=1440&height=648"
+            ],
+            "0010": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211135967969330/3.png",
+                {
+                    "name": "https://c.tenor.com/zhBuINyYow0AAAAC/withered-freddy-twerk.gif",
+                    "rarity": 1
+                }
+            ],
+            "1010": "https://cdn.discordapp.com/attachments/720701609855680552/931211197016072262/13.png",
+            "0110": "https://cdn.discordapp.com/attachments/720701609855680552/931211244323606538/23.png",
+            "1110": "https://cdn.discordapp.com/attachments/720701609855680552/931211281237680168/123.png",
+            "1100": "https://cdn.discordapp.com/attachments/720701609855680552/931211324229308436/12.png"
+        },
+        "followUps": [
+            "5",
+            "7",
+            "2A",
+            "4A"
+        ]
+    },
+    "1C": {
+        "isFoxy": true,
+        "defaultState": "0001",
+        "name": "Pirate Cove",
+        "pictures": {
+            "0": "https://media.discordapp.net/attachments/720701609855680552/931211384459513946/0.png?width=1440&height=648",
+            "1": "https://cdn.discordapp.com/attachments/720701609855680552/931211478156050432/1.png",
+            "2": "https://cdn.discordapp.com/attachments/720701609855680552/931211507415539842/2.png",
+            "3": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211550100975666/3.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211583424700416/3-2.png"
+            ]
+        },
+        "followUps": [
+            "2A"
+        ]
+    },
+    "2A": {
+        "defaultState": "0000",
+        "name": "West Hall",
+        "pictures": {
+            "0000": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211634444230703/empty.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211634712670218/empty-2.png"
+            ],
+            "1000": "https://cdn.discordapp.com/attachments/720701609855680552/931211634167402526/1.png",
+            "0001": "https://cdn.discordapp.com/attachments/720701609855680552/931211635035619358/foxy-run.gif"
+        },
+        "followUps": [
+            "1B",
+            "3",
+            "2B"
+        ]
+    },
+    "2B": {
+        "defaultState": "0000",
+        "name": "W. Hall Corner",
+        "pictures": {
+            "0000": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211840321650698/empty.png",
+                {
+                    "name": "https://cdn.discordapp.com/attachments/720701609855680552/931211840636203088/empty-2.png",
+                    "rarity": 30
+                },
+                {
+                    "name": "https://cdn.discordapp.com/attachments/720701609855680552/931211840963375254/empty-3.png",
+                    "rarity": 0.01
+                }
+            ],
+            "1000": [
+                "https://media.discordapp.net/attachments/720701609855680552/931211839331782697/1.png?width=1440&height=648",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211839663140924/1-2.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931211839977709618/1-3.png"
+            ]
+        },
+        "followUps": [
+            "2A",
+            "Office"
+        ]
+    },
+    "3": {
+        "defaultState": "0000",
+        "name": "Supply Closet",
+        "pictures": {
+            "0000": "https://cdn.discordapp.com/attachments/720701609855680552/931212027685388338/empty.png",
+            "1000": "https://cdn.discordapp.com/attachments/720701609855680552/931212027320475729/1.png"
+        },
+        "followUps": [
+            "2A",
+            "2B"
+        ]
+    },
+    "4A": {
+        "defaultState": "0000",
+        "name": "East Hall",
+        "pictures": {
+            "0000": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212120920580137/empty.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212121176408115/empty-2.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212121465819156/empty-3.png"
+            ],
+            "0100": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212119192526868/2.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212119570010155/2-2.png"
+            ],
+            "0010": "https://cdn.discordapp.com/attachments/720701609855680552/931212120652132372/3.png"
+        },
+        "followUps": [
+            "4B",
+            "7"
+        ]
+    },
+    "4B": {
+        "defaultState": "0000",
+        "name": "E. Hall Corner",
+        "pictures": {
+            "0000": "https://cdn.discordapp.com/attachments/720701609855680552/931212363774963792/empty.png",
+            "0100": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212361728159824/2.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212362055307354/2-2.png"
+            ],
+            "0010": "https://cdn.discordapp.com/attachments/720701609855680552/931212362382454794/3.png"
+        },
+        "followUps": [
+            "4A",
+            "Office"
+        ]
+    },
+    "5": {
+        "defaultState": "0000",
+        "name": "Backstage",
+        "pictures": {
+            "0000": "https://cdn.discordapp.com/attachments/720701609855680552/931212489834758154/empty.png",
+            "1000": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212488870080543/1.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212489394380850/1-2.png"
+            ]
+        },
+        "followUps": [
+            "1B",
+            "2A"
+        ]
+    },
+    "7": {
+        "defaultState": "0000",
+        "name": "Restroom",
+        "pictures": {
+            "0000": "https://cdn.discordapp.com/attachments/720701609855680552/931212582390489088/empty.png",
+            "0100": [
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212580914085958/2.png",
+                "https://cdn.discordapp.com/attachments/720701609855680552/931212581400608889/2-2.png"
+            ],
+            "0010": "https://cdn.discordapp.com/attachments/720701609855680552/931212581937508382/3.png"
+        },
+        "followUps": [
+            "4A",
+            "1B"
+        ]
+    }
+}

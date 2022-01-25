@@ -1,0 +1,50 @@
+{
+    "leftDoor": {
+        "name": "leftdoor",
+        "id": "929067481052618814"
+    },
+    "leftLight":{
+        "name": "leftlight",
+        "id": "929069767837499452"
+    },
+    "rightDoor": {
+        "name": "rightdoor",
+        "id": "929069767782989964"
+    },
+    "rightLight": {
+        "name": "rightlight",
+        "id": "929069767715876875"
+    },
+    "camera":{
+        "name": "camera",
+        "id": "929074485225717771"
+    },
+    "green":{
+        "name": "green",
+        "id": "929939441508839534"
+    },
+    "red":{
+        "name": "red",
+        "id": "929939441542373416"
+    },
+    "yellow":{
+        "name": "yellow",
+        "id": "929939441513033769"
+    },
+    "lime":{
+        "name": "lime",
+        "id": "930120680295514192"
+    },
+    "freddy":{
+        "name": "freddy",
+        "id": "931388297635311647"
+    },
+    "chica":{
+        "name": "chica",
+        "id": "931580625318727710"
+    },
+    "bonnie":{
+        "name": "bonnie",
+        "id": "931582262439456778"
+    }
+}
