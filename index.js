@@ -2,16 +2,17 @@ const { Client, Intents, MessageReaction, RichPresenceAssets, DataResolver } = r
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 require('dotenv').config();
 
-// Classes and functions
-const {Camera, Scene, Picture} = require('./classes/Camera');
+// Classes
+const { Camera, Scene, Picture } = require('./classes/Camera');
 const { Animatronic, Freddy, Foxy } = require('./classes/Animatronic');
 const { Door } = require('./classes/Door');
 const { Office } = require('./classes/Office');
 const { Clock } = require('./classes/Clock');
+const { CameraSystem } = require('./classes/CameraSystem');
+
+// Functions
 const utils = require('./utils/utils');
-const { performance } = require('perf_hooks');
 const { clamp } = require('./utils/utils');
-const { isGeneratorFunction } = require('util/types');
 
 // Data
 let cameraData = require('./data/cameras.json');
@@ -23,14 +24,11 @@ let images = require('./data/images.json');
 
 
 let animatronics = [];
-let cameras = [];
-let cameraIndex = 0;
 isWatching = false;
 let deleteTime = 2000;
 let power = 100;
 // 1 hour passes in the game each 1 minute and 30 seconds
 let clock = new Clock();
-let room = "Office";
 let fullUsage = ["🟩", "🟩", "🟨", "🟥"];
 let powerUsage = [9.6, 4.8, 3.2, 2.4]; // each second
 let extraUsage = 0;
@@ -45,8 +43,6 @@ let startImg = false;
 let extraMsgs = [];
 
 let Home = new Office(new Door(), new Door());
-
-let office = Home.getPicture();
 
 // Emojis by Id and name
 let emoIds = utils.objectMap(emojiData, e => e.id);
@@ -75,32 +71,36 @@ const getNight = (n) => {
     if (data.time) callTime = (data.time + 10) * 1000;
 }
 
+// Getting the camera data into camera objects
+
+const getCameras = (cameraData) => {
+    let cameras = [];    
+    for (let cam in cameraData) {
+        let data = cameraData[cam];
+        let src = "./assets/Cameras/" + cam + "/";
+        src = "";
+        let scenes = [];
+        for (const [s, p] of Object.entries(data.pictures)) {
+            let scene = s;
+            let picture = p;
+            if (!Array.isArray(picture)) picture = [picture];
+            let pictures = [];
+            for (const [key, value] of Object.entries(picture)) {
+                let rarity = value.rarity ? value.rarity : 100;
+                let name = value.name ? value.name : value;
+                pictures.push(new Picture(name, rarity));
+            }
+            scenes["i" + scene.toString()] = new Scene(pictures);
+        }
+
+        cameras.push(new Camera(cam, data.name, scenes, src, data.followUps, data.defaultState.split("").map(e => parseInt(e))));
+    }
+    return cameras;
+}
+
 getNight(night);
 
 const setLevels = () => animatronics.forEach(a => a.level = levels[a.id]);
-
-
-// Getting the camera data into camera objects
-for (let cam in cameraData) {
-    let data = cameraData[cam];
-    let src = "./assets/Cameras/" + cam + "/";
-    src = "";
-    let scenes = [];
-    for(const [s, p] of Object.entries(data.pictures)) {
-        let scene = s;
-        let picture = p;
-        if(!Array.isArray(picture)) picture = [picture];
-        let pictures = [];
-        for(const [key,value] of Object.entries(picture)) {
-            let rarity = value.rarity ? value.rarity : 100;
-            let name = value.name ? value.name : value;
-            pictures.push(new Picture(name, rarity));
-        }
-        scenes["i"+scene.toString()] = new Scene(pictures);
-    }
-    
-    cameras.push(new Camera(cam, data.name, scenes, src, data.followUps, data.defaultState.split("").map(e => parseInt(e))));
-}
 
 const getAnim = (name, cameras, time, sensitive, id, camera, spawn, screamer, level, type = 1) => {
     switch (type) {
@@ -126,15 +126,9 @@ animatronics[1].door = Home.rightDoor;
 animatronics[2].door = Home.rightDoor;
 animatronics[3].door = Home.leftDoor;
 
-
-cameras.sort((a, b) => a.name.localeCompare(b.name));
-camera = cameras[cameraIndex];
+let cameraSystem = new CameraSystem(getCameras(cameraData));
 
 const getEmojiName = (name, id) => "<:" + name + ":" + id + ">";
-
-// Console log with all the data
-// const util = require('util');
-// console.log(util.inspect(cameras, {showHidden: false, depth: null}));
 
 // Using custom emojis for the Usage
 if (emoNames.yellow && emoNames.green && emoNames.red) {
@@ -174,16 +168,16 @@ canUseCamera = () => checkGame() && !powerOut && isWatching;
 
 const checkCamera = () => {
     if (!canUseCamera()) return;
-    let picture = camera.getPicture();
+    let camera = cameraSystem.camera;
+    let picture = cameraSystem.getPicture();
     gameMsg.edit(getMessage());
-    //sendImageSetGame(picture);
     dontRun = true;
     game.edit(picture).then(() => dontRun = false);
     if (camera.name == "2A" && camera.checkActive("0001") && !checked2A) {
         foxyCounter = foxyCounter > 5 ? 5 : foxyCounter;
         checked2A = true;
     }
-    if(camera.name == "2B" && !Home.yellowBear ) Home.yellowBear = (picture == camera.yellowBear);
+    if (camera.name == "2B" && !Home.yellowBear) Home.yellowBear = (picture == camera.yellowBear);
 }
 
 
@@ -207,18 +201,6 @@ const FlickerMenu = (msg) => {
 
 
 commands = {
-    "load": function (message, args) {
-        for (const key in Home.states) message.author.send(Home.states[key]);
-
-        animatronics.forEach(a => message.author.send(a.screamer));
-
-        cameras.forEach(c => {
-            for (const key in c.pictures) {
-                if (typeof (c.pictures[key]) != "string") c.pictures[key].forEach(p => message.author.send(p));
-                else message.author.send(c.pictures[key]);
-            }
-        })
-    },
     "night": function (message, args) {
         let newNight = args[0];
         if (isNaN(newNight)) {
@@ -297,7 +279,7 @@ commands = {
         gameStarted = true;
         gameMsg.edit(getMessage());
         //sendImageSetGame(office)
-        game.edit(office).then(async () => {
+        game.edit(Home.getPicture()).then(async () => {
             let reactions = [emoIds.leftDoor, emoIds.leftLight, "⬅", emoIds.camera, "➡", emoIds.rightLight, emoIds.rightDoor];
 
             for (const r of reactions) await game.react(r);
@@ -378,24 +360,25 @@ commands = {
     },
     "camera": function (message, args) {
         if (!checkGame() || powerOut) return;
+        let camera = cameraSystem.camera;
         Home.leftDoor.isOn = false;
         Home.rightDoor.isOn = false;
         checkUsage();
         isWatching = !isWatching;
-        room = camera.room;
+        cameraSystem.updateRoom();
         if (!isWatching) {
             if (Home.inside.length > 0) animatronics.forEach(a => attemptKill(a, true));
             else {
                 //sendImageSetGame(Home.getPicture());
                 dontRun = true;
                 game.edit(Home.getPicture()).then(() => dontRun = false);
-                room = "Office";
+                cameraSystem.room = "Office";
                 updateUsage(-1);
                 gameMsg.edit(getMessage());
             }
             return;
         }
-        else{
+        else {
             Home.yellowBear = false;
             yBCounter = yBKillTime;
             updateUsage(1);
@@ -404,12 +387,12 @@ commands = {
     },
     "next": function (message, args) {
         if (!checkGame() || !isWatching) return;
-        changeCamera(1);
+        cameraSystem.changeCamera(1);
         checkCamera();
     },
     "prev": function (message, args) {
         if (!checkGame() || !isWatching) return;
-        changeCamera(-1);
+        cameraSystem.changeCamera(-1);
         checkCamera();
     },
     "select": function (message, args) {
@@ -421,8 +404,7 @@ commands = {
             sendMessageDelete(message, "Camera not found", null);
             return;
         }
-        cameraIndex = cameras.indexOf(camera);
-        room = camera.room;
+        cameraSystem.setCamera(cameraSystem.cameras.indexOf(camera));
         checkCamera();
     },
     "cameras": function (message, args) {
@@ -457,25 +439,26 @@ FPS = 60;
 const gameLoop = () => {
     //if (dontRun) console.log("dontRun");
     if (!dontRun) {
+        let camera = cameraSystem.camera;
         timer++;
         let realTime = 1 / FPS;
         //console.log("Running");
 
-        clock.hourCounter+= realTime;
+        clock.hourCounter += realTime;
 
-        if(Home.yellowBear && !isWatching){
-            yBCounter-= realTime;
-            if(yBCounter <= 0){
+        if (Home.yellowBear && !isWatching) {
+            yBCounter -= realTime;
+            if (yBCounter <= 0) {
                 yellowBearKill();
                 return;
             }
         }
 
         animatronics.forEach(a => {
-            a.counter+= realTime;
-            if (Home.inside.includes(a.id)) a.killTime-= realTime
+            a.counter += realTime;
+            if (Home.inside.includes(a.id)) a.killTime -= realTime
             if (a.id == 3 && a.phase > 2) {
-                foxyCounter-= realTime
+                foxyCounter -= realTime
                 if (foxyCounter <= 0) {
                     if (!a.door.isClosed) EndGame(a.screamer);
                     else {
@@ -498,7 +481,7 @@ const gameLoop = () => {
             timer = 0;
             secondPassed = true;
 
-            if (clock.checkPassed()){
+            if (clock.checkPassed()) {
                 clock.advanceHour();
                 gameMsg.edit(getMessage());
                 checkHour();
@@ -590,7 +573,7 @@ const gameLoop = () => {
                                     //console.log(a.name + "left the room");
                                     a.door.occupied = false;
                                     a.atDoor = false;
-                                    let spawnCamera = cameras.find(cam => cam.name == a.spawn);
+                                    let spawnCamera = getCameraByName(a.spawn);
                                     if (spawnCamera) {
                                         spawnCamera.active[a.id] = 1;
                                         a.camera = spawnCamera.name;
@@ -688,7 +671,10 @@ const sendImageSetGame = async (picture) => {
 
 const getUsage = () => fullUsage.slice(0, usage).join("");
 
-const getMessage = () => room + (isWatching ? " [ " + camera.name + " ]" : "") + " - Power: " + Math.round(power) + "% - " + clock.getCurrentHour() + "AM" + "\n" + "Usage: " + getUsage() + "\n" + extraMsgs.join("\n");
+const getMessage = () => {
+    let { room, camera } = cameraSystem;
+    return room + (isWatching ? " [ " + camera.name + " ]" : "") + " - Power: " + Math.round(power) + "% - " + clock.getCurrentHour() + "AM" + "\n" + "Usage: " + getUsage() + "\n" + extraMsgs.join("\n");
+}
 
 const updateUsage = (val) => {
     usage = utils.clamp(usage + val, 1, fullUsage.length);
@@ -709,12 +695,10 @@ const resetVariables = () => {
     timer = 0;
     power = 100;
     usage = 1;
-    cameraIndex = 0;
-    camera = cameras[cameraIndex];
-    room = "Office";
     counter = 0;
     maxCounter = 0;
     clock.reset();
+    cameraSystem.reset();
     musicMsg = null;
     gameStarted = false;
     gameMsg = null;
@@ -738,7 +722,7 @@ const EndGame = (screamer) => {
 }
 
 const deleteMessage = (message) => {
-    if(!message) return;
+    if (!message) return;
     message.delete().catch(e => {
         console.log(e);
     });
@@ -837,14 +821,6 @@ const checkPower = () => {
     if (power <= 0) cutPower();
 }
 
-const changeCamera = (val) => {
-    cameraIndex += val;
-    if (cameraIndex >= cameras.length) cameraIndex = 0;
-    if (cameraIndex < 0) cameraIndex = cameras.length - 1;
-    camera = cameras[cameraIndex];
-    room = camera.room;
-}
-
 const closeDoor = (door) => {
     if (isWatching) return false;
     let open = door.open();
@@ -891,9 +867,9 @@ const enterOffice = (a) => {
     return true;
 }
 
-const getCameraByName = (name) => cameras.find(c => c.name == name);
+const getCameraByName = (name) => cameraSystem.getCameraByName(name);
 
-const watchingCamera = (cam) => isWatching && cam.name == camera.name;
+const watchingCamera = (cam) => isWatching && cam.name == cameraSystem.camera.name;
 
 const checkAndPush = (arr, val) => {
     if (arr.indexOf(val) == -1) {
@@ -936,19 +912,20 @@ const freddyLaugh = () => {
     addGameMsg(utils.getRandomElement(fMsgs) + getEmojiName(emoNames.freddy, emoIds.freddy));
 }
 
-const yellowBearKill = async () =>{
-    if(!checkMsg()) return;
+const yellowBearKill = async () => {
+    if (!checkMsg()) return;
     _1987 = true;
-    await game.edit("https://cdn.discordapp.com/attachments/720701609855680552/931382533264908378/golden_freddy.png").then( msg => {
+    await game.edit("https://cdn.discordapp.com/attachments/720701609855680552/931382533264908378/golden_freddy.png").then(msg => {
         setTimeout(() => {
 
             msg.delete().catch(e => console.log(e));
             gameMsg.delete().catch(e => console.log(e));
-            if(callMsg) callMsg.delete().catch(e => console.log(e));
-            if(musicMsg) musicMsg.delete().catch(e => console.log(e));
+            if (callMsg) callMsg.delete().catch(e => console.log(e));
+            if (musicMsg) musicMsg.delete().catch(e => console.log(e));
             resetVariables();
 
             _1987 = false;
         }, 1000)
     });
 }
+
